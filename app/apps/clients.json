@@ -1,0 +1,24 @@
+[
+    {
+        "first_name": "John",
+        "last_name": "Doe",
+        "phone": "123-456-7890",
+        "cellphone": "987-654-3210",
+        "address": "123 Elm St",
+        "city": "Springfield",
+        "province": "IL",
+        "postal_code": "62701",
+        "file_path": "apps/clients.json"
+    },
+    {
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "phone": "555-123-4567",
+        "cellphone": "555-765-4321",
+        "address": "456 Oak St",
+        "city": "Chicago",
+        "province": "IL",
+        "postal_code": "60601",
+        "file_path": "apps/clients.json"
+    }
+]

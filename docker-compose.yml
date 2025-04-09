@@ -1,0 +1,12 @@
+version: '3'
+services:
+  client-gui:
+    build: .
+    container_name: client-gui
+    environment:
+      - DISPLAY=host.docker.internal:0.0  # The host machine X11 server (VcXsrv)
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    ports:
+      - "5000:5000"  # Expose any ports if required
+    restart: always
