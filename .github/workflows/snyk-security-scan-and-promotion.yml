@@ -95,3 +95,5 @@ jobs:
           git checkout $TARGET_BRANCH
           git merge --no-ff origin/${GITHUB_REF#refs/heads/} -m "Auto-promotion from ${GITHUB_REF#refs/heads/} to $TARGET_BRANCH"
           git push origin $TARGET_BRANCH
+
+          
