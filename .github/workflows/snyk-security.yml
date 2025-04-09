@@ -2,43 +2,56 @@ name: Snyk Security
 
 on:
   push:
-    branches: ["main", "Development", "Stage", "Release-Candidate", "UAT"]
+    branches:
+      - main
+      - Development
+      - Stage
+      - Release-Candidate
+      - UAT
+      - Production
   pull_request:
-    branches: ["main"]
+    branches:
+      - main
+      - Development
+      - Stage
+      - Release-Candidate
+      - UAT
+      - Production
 
 permissions:
   contents: read
+  security-events: write  # For uploading SARIF results to GitHub Security Scanning
 
 jobs:
   snyk:
     permissions:
-      contents: read
-      security-events: write
-      actions: read
+      contents: read # For actions/checkout to fetch code
+      security-events: write # For github/codeql-action/upload-sarif to upload SARIF results
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Snyk CLI to check for security issues
-        uses: snyk/actions/setup@806182742461562b67788a64410098c9d9b96adb
 
+    steps:
+      # Step 1: Checkout the repository
+      - uses: actions/checkout@v4
+
+      # Step 2: Set up Snyk CLI to check for security issues
+      - name: Set up Snyk CLI
+        uses: snyk/actions/setup@806182742461562b67788a64410098c9d9b96adb
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Snyk Code test
-        run: snyk code test --sarif > snyk-code.sarif # || true
+      # Step 3: Run Snyk Code (SAST) analysis and upload results to GitHub Code Scanning
+      - name: Run Snyk Code test
+        run: snyk code test --sarif > snyk-code.sarif
 
+      # Step 4: Monitor Snyk Open Source (SCA) issues for all projects
       - name: Snyk Open Source monitor
         run: snyk monitor --all-projects
 
+      # Step 5: Run Snyk Infrastructure as Code (IaC) test
       - name: Snyk IaC test and report
-        run: snyk iac test --report # || true
+        run: snyk iac test --report
 
-      - name: Build a Docker image
-        run: docker build -t your/image-to-test .
-
-      - name: Snyk Container monitor
-        run: snyk container monitor your/image-to-test --file=Dockerfile
-
+      # Step 6: Upload the results to GitHub Code Scanning
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
