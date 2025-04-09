@@ -1,4 +1,4 @@
-name: Snyk Security Scan & Branch Promotion
+name: Snyk Security Scan
 
 on:
   push:
@@ -37,63 +37,5 @@ jobs:
 
       - name: Run Snyk test
         run: snyk test --file=requirements.txt
-
-  promote:
-    name: Promote to next branch if Snyk passes
-    runs-on: ubuntu-latest
-    if: success() && github.event_name == 'push'
-
-    environment:
-      name: ${{ env.TARGET_ENV }}
-
-    steps:
-      - name: Checkout source branch
-        uses: actions/checkout@v3
-
-      - name: Set up Git
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-
-      - name: Determine target branch and environment
-        id: set-branch-env
-        run: |
-          BRANCH="${GITHUB_REF#refs/heads/}"
-          echo "Current branch: $BRANCH"
-          case "$BRANCH" in
-            main)
-              echo "TARGET_BRANCH=Development" >> $GITHUB_ENV
-              echo "TARGET_ENV=Development" >> $GITHUB_ENV
-              ;;
-            Development)
-              echo "TARGET_BRANCH=Stage" >> $GITHUB_ENV
-              echo "TARGET_ENV=Stage" >> $GITHUB_ENV
-              ;;
-            Stage)
-              echo "TARGET_BRANCH=Release-Candidate" >> $GITHUB_ENV
-              echo "TARGET_ENV=Release-Candidate" >> $GITHUB_ENV
-              ;;
-            Release-Candidate)
-              echo "TARGET_BRANCH=UAT" >> $GITHUB_ENV
-              echo "TARGET_ENV=UAT" >> $GITHUB_ENV
-              ;;
-            UAT)
-              echo "TARGET_BRANCH=Production" >> $GITHUB_ENV
-              echo "TARGET_ENV=Production" >> $GITHUB_ENV
-              ;;
-            *)
-              echo "No promotion required for branch $BRANCH"
-              exit 0
-              ;;
-          esac
-
-      - name: Fetch all branches
-        run: git fetch origin
-
-      - name: Merge and push to next branch
-        run: |
-          git checkout $TARGET_BRANCH
-          git merge --no-ff origin/${GITHUB_REF#refs/heads/} -m "Auto-promotion from ${GITHUB_REF#refs/heads/} to $TARGET_BRANCH"
-          git push origin $TARGET_BRANCH
 
           
