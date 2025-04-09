@@ -43,9 +43,6 @@ jobs:
     runs-on: ubuntu-latest
     if: success() && github.event_name == 'push'
 
-    environment:
-      name: ${{ env.TARGET_ENV }}
-
     steps:
       - name: Checkout source branch
         uses: actions/checkout@v3
@@ -92,8 +89,8 @@ jobs:
 
       - name: Merge and push to next branch
         run: |
-          git checkout $TARGET_BRANCH
-          git merge --no-ff origin/${GITHUB_REF#refs/heads/} -m "Auto-promotion from ${GITHUB_REF#refs/heads/} to $TARGET_BRANCH"
-          git push origin $TARGET_BRANCH
+          git checkout ${{ env.TARGET_BRANCH }}
+          git merge --no-ff origin/${GITHUB_REF#refs/heads/} -m "Auto-promotion from ${GITHUB_REF#refs/heads/} to ${{ env.TARGET_BRANCH }}"
+          git push origin ${{ env.TARGET_BRANCH }}
 
           
